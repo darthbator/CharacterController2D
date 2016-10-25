@@ -1,19 +1,19 @@
 OverheadCharacterController2D
 =====================
 
-OverheadCharacterController2D is a fork of prime 31's excellent 2D character controller refactored for use in overhead 2D games. This controller functions similarly to the built-in Unity CharacterController component. It has a similar API (mainly a *move* method that takes a delta movement) and provides a firm base with which to make a super solid controller using Unity's 2D system.
+OverheadCharacterController2D is a fork of prime31's excellent [2D character controller](https://github.com/darthbator/OverheadCharacterController2D) refactored for use in overhead 2D games. This controller functions similarly to the built-in Unity CharacterController component. It has a similar API (mainly a *move* method that takes a delta movement) and provides a firm base with which to make a super solid controller using Unity's 2D system.
 
 
 Demo Scene
 =====================
 
-
+The included demo scene is minimal to keep things as simple as possible. It has very basic input detection (using WASD to move around) and a simple character sprite/Animator setup. This should be simple enough for anyone with a rudimentry knowledge of Unity to read through and understand.
 
 
 Basic Setup
 =====================
 
-Setup is pretty simple: drag the CharacterController2D onto your player/enemy GameObject and set the *platformMask* in the inspector to contain any layers that you want the player to collide with. *ProTip*: make sure your player is on a separate layer than your platforms so that she doesn't try to collide with herself! You will also want to make sure you BoxCollider2D is centered and has a zero horizontal offset. Flipping requires setting the scale.x to -1 so a horizontal offset other than zero will result in the collider jumping around.
+Setup is pretty simple: drag the OverheadCharacterController2D onto your player/enemy GameObject and set the *platformMask* in the inspector to contain any layers that you want the player to collide with. *ProTip*: make sure your player is on a separate layer than your platforms so that she doesn't try to collide with herself! You will also want to make sure you BoxCollider2D is centered and has a zero horizontal offset. Flipping requires setting the scale.x to -1 so a horizontal offset other than zero will result in the collider jumping around.
 
 You can then tweak the *totalHorizontalRays* and *totalVerticalRays* to your liking. When in the editor rays will be drawn with *Debug.DrawRay* so that you can make sure the ray resolution is appropriate for your smallest platform size. To turn off ray debugging just comment out the *#define DEBUG_CC2D_RAYS* line at the top of the CharacterController2D.cs file.
 
