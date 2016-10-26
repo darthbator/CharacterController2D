@@ -4,12 +4,12 @@ using System.Collections;
 public class DemoControls : MonoBehaviour {
 	public float moveSpeed;
 	private Vector2 moveAmount;
-	private OverheadCharacterController2D characterController;
+	private CharacterController2D characterController;
 	private SpriteRenderer spriteGraphics;
 	private Animator animator;
 
 	void Start () {
-		characterController = GetComponent<OverheadCharacterController2D>();
+		characterController = GetComponent<CharacterController2D>();
 		animator = GetComponent<Animator>();
 		spriteGraphics = GetComponent<SpriteRenderer>();
 	}

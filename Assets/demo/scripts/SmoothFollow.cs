@@ -10,14 +10,14 @@ public class SmoothFollow : MonoBehaviour
 	public Vector3 cameraOffset;
 	public bool useFixedUpdate = false;
 	
-	private OverheadCharacterController2D _playerController;
+	private CharacterController2D _playerController;
 	private Vector3 _smoothDampVelocity;
 	
 	
 	void Awake()
 	{
 		transform = gameObject.transform;
-		_playerController = target.GetComponent<OverheadCharacterController2D>();
+		_playerController = target.GetComponent<CharacterController2D>();
 	}
 	
 	

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(BoxCollider2D), typeof(Rigidbody2D))]
-public class OverheadCharacterController2D : MonoBehaviour {
+public class CharacterController2D : MonoBehaviour {
 	#region internal types
 
 	struct CharacterRaycastOrigins {
@@ -69,7 +69,7 @@ public class OverheadCharacterController2D : MonoBehaviour {
 	/// <summary>
 	/// mask with all layers that the player should interact with
 	/// </summary>
-	public LayerMask platformMask = 0;
+	public LayerMask obstacleMask = 0;
 
 	/// <summary>
 	/// mask with all layers that trigger events should fire when intersected
@@ -247,7 +247,7 @@ public class OverheadCharacterController2D : MonoBehaviour {
 
 			DrawRay(ray, rayDirection * rayDistance, Color.red);
 
-			_raycastHit = Physics2D.Raycast(ray, rayDirection, rayDistance, platformMask);
+			_raycastHit = Physics2D.Raycast(ray, rayDirection, rayDistance, obstacleMask);
 			if (_raycastHit) {
 				// set our new deltaMovement and recalculate the rayDistance taking it into account
 				deltaMovement.x = _raycastHit.point.x - ray.x;
@@ -282,7 +282,7 @@ public class OverheadCharacterController2D : MonoBehaviour {
 		initialRayOrigin.x += deltaMovement.x;
 
 		// if we are moving up, we should ignore the layers in oneWayPlatformMask
-		var mask = platformMask;
+		var mask = obstacleMask;
 		/*if( ( isGoingUp && !collisionState.wasGroundedLastFrame ) || ignoreOneWayPlatformsThisFrame )
 			mask &= ~oneWayPlatformMask;*/
 
