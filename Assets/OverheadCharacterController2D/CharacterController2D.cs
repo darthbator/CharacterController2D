@@ -19,12 +19,12 @@ public class CharacterController2D : MonoBehaviour {
 		public bool above;
 		public bool below;
 
-		public bool hasCollision () {
+		public bool HasCollision () {
 			return below || right || left || above;
 		}
 
 
-		public void reset () {
+		public void Reset () {
 			right = left = above = below = false;
 		}
 
@@ -57,7 +57,7 @@ public class CharacterController2D : MonoBehaviour {
 	/// defines how far in from the edges of the collider rays are cast from. If cast with a 0 extent it will often result in ray hits that are
 	/// not desired (for example a foot collider casting horizontally from directly on the surface can result in a hit)
 	/// </summary>
-	public float skinWidth {
+	public float SkinWidth {
 		get { return _skinWidth; }
 		set {
 			_skinWidth = value;
@@ -126,7 +126,7 @@ public class CharacterController2D : MonoBehaviour {
 		rigidBody2D = GetComponent<Rigidbody2D>();
 
 		// here, we trigger our properties that have setters with bodies
-		skinWidth = _skinWidth;
+		SkinWidth = _skinWidth;
 
 		// we want to set our CC2D to ignore all collision layers except what is in our triggerMask
 		for (var i = 0; i < 32; i++) {
@@ -169,7 +169,7 @@ public class CharacterController2D : MonoBehaviour {
 	/// <param name="deltaMovement">Delta movement.</param>
 	public void Move (Vector3 deltaMovement) {
 		// clear our state
-		collisionState.reset();
+		collisionState.Reset();
 		_raycastHitsThisFrame.Clear();
 
 		PrimeRaycastOrigins();
