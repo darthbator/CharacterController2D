@@ -38,10 +38,10 @@ public class CharacterController2D : MonoBehaviour {
 	#endregion
 
 	#region events, properties and fields
-	public event Action<RaycastHit2D> onControllerCollidedEvent;
-	public event Action<Collider2D> onTriggerEnterEvent;
-	public event Action<Collider2D> onTriggerStayEvent;
-	public event Action<Collider2D> onTriggerExitEvent;
+	public event Action<RaycastHit2D> OnControllerCollidedEvent;
+	public event Action<Collider2D> OnTriggerEnterEvent;
+	public event Action<Collider2D> OnTriggerStayEvent;
+	public event Action<Collider2D> OnTriggerExitEvent;
 
 
 	/// <summary>
@@ -61,7 +61,7 @@ public class CharacterController2D : MonoBehaviour {
 		get { return _skinWidth; }
 		set {
 			_skinWidth = value;
-			recalculateDistanceBetweenRays();
+			RecalculateDistanceBetweenRays();
 		}
 	}
 
@@ -106,6 +106,7 @@ public class CharacterController2D : MonoBehaviour {
 	/// stores our raycast hit during movement
 	/// </summary>
 	RaycastHit2D _raycastHit;
+	RaycastHit2D _raycastProbeHit;
 
 	/// <summary>
 	/// stores any raycast hits that occur this frame. we have to store them in case we get a hit moving
@@ -137,20 +138,20 @@ public class CharacterController2D : MonoBehaviour {
 
 
 	public void OnTriggerEnter2D (Collider2D col) {
-		if (onTriggerEnterEvent != null)
-			onTriggerEnterEvent(col);
+		if (OnTriggerEnterEvent != null)
+			OnTriggerEnterEvent(col);
 	}
 
 
 	public void OnTriggerStay2D (Collider2D col) {
-		if (onTriggerStayEvent != null)
-			onTriggerStayEvent(col);
+		if (OnTriggerStayEvent != null)
+			OnTriggerStayEvent(col);
 	}
 
 
 	public void OnTriggerExit2D (Collider2D col) {
-		if (onTriggerExitEvent != null)
-			onTriggerExitEvent(col);
+		if (OnTriggerExitEvent != null)
+			OnTriggerExitEvent(col);
 	}
 	#endregion
 
@@ -166,20 +167,20 @@ public class CharacterController2D : MonoBehaviour {
 	/// stop when run into.
 	/// </summary>
 	/// <param name="deltaMovement">Delta movement.</param>
-	public void move (Vector3 deltaMovement) {
+	public void Move (Vector3 deltaMovement) {
 		// clear our state
 		collisionState.reset();
 		_raycastHitsThisFrame.Clear();
 
-		primeRaycastOrigins();
+		PrimeRaycastOrigins();
 
 		// now we check movement in the horizontal dir
 		if (deltaMovement.x != 0f)
-			moveHorizontally(ref deltaMovement);
+			MoveHorizontally(ref deltaMovement);
 
 		// next, check movement in the vertical dir
 		if (deltaMovement.y != 0f)
-			moveVertically(ref deltaMovement);
+			MoveVertically(ref deltaMovement);
 
 		// move then update our state
 		deltaMovement.z = 0;
@@ -190,9 +191,9 @@ public class CharacterController2D : MonoBehaviour {
 			velocity = deltaMovement / Time.deltaTime;
 
 		// send off the collision events if we have a listener
-		if (onControllerCollidedEvent != null) {
+		if (OnControllerCollidedEvent != null) {
 			for (var i = 0; i < _raycastHitsThisFrame.Count; i++)
-				onControllerCollidedEvent(_raycastHitsThisFrame [i]);
+				OnControllerCollidedEvent(_raycastHitsThisFrame [i]);
 		}
 	}
 
@@ -200,7 +201,7 @@ public class CharacterController2D : MonoBehaviour {
 	/// this should be called anytime you have to modify the BoxCollider2D at runtime. It will recalculate the distance between the rays used for collision detection.
 	/// It is also used in the skinWidth setter in case it is changed at runtime.
 	/// </summary>
-	public void recalculateDistanceBetweenRays () {
+	public void RecalculateDistanceBetweenRays () {
 		// figure out the distance between our rays in both directions
 		// horizontal
 		var colliderUseableHeight = boxCollider.size.y * Mathf.Abs(transform.localScale.y) - (2f * _skinWidth);
@@ -220,7 +221,7 @@ public class CharacterController2D : MonoBehaviour {
 	/// </summary>
 	/// <param name="futurePosition">Future position.</param>
 	/// <param name="deltaMovement">Delta movement.</param>
-	void primeRaycastOrigins () {
+	void PrimeRaycastOrigins () {
 		// our raycasts need to be fired from the bounds inset by the skinWidth
 		var modifiedBounds = boxCollider.bounds;
 		modifiedBounds.Expand(-2f * _skinWidth);
@@ -236,7 +237,7 @@ public class CharacterController2D : MonoBehaviour {
 	/// we have to increase the ray distance skinWidth then remember to remove skinWidth from deltaMovement before
 	/// actually moving the player
 	/// </summary>
-	void moveHorizontally (ref Vector3 deltaMovement) {
+	void MoveHorizontally (ref Vector3 deltaMovement) {
 		var isGoingRight = deltaMovement.x > 0;
 		var rayDistance = Mathf.Abs(deltaMovement.x) + _skinWidth;
 		var rayDirection = isGoingRight ? Vector2.right : -Vector2.right;
@@ -272,7 +273,7 @@ public class CharacterController2D : MonoBehaviour {
 		}
 	}
 
-	void moveVertically (ref Vector3 deltaMovement) {
+	void MoveVertically (ref Vector3 deltaMovement) {
 		var isGoingUp = deltaMovement.y > 0;
 		var rayDistance = Mathf.Abs(deltaMovement.y) + _skinWidth;
 		var rayDirection = isGoingUp ? Vector2.up : -Vector2.up;
@@ -281,16 +282,11 @@ public class CharacterController2D : MonoBehaviour {
 		// apply our horizontal deltaMovement here so that we do our raycast from the actual position we would be in if we had moved
 		initialRayOrigin.x += deltaMovement.x;
 
-		// if we are moving up, we should ignore the layers in oneWayPlatformMask
-		var mask = obstacleMask;
-		/*if( ( isGoingUp && !collisionState.wasGroundedLastFrame ) || ignoreOneWayPlatformsThisFrame )
-			mask &= ~oneWayPlatformMask;*/
-
 		for (var i = 0; i < totalVerticalRays; i++) {
 			var ray = new Vector2 (initialRayOrigin.x + i * _horizontalDistanceBetweenRays, initialRayOrigin.y);
 
 			DrawRay(ray, rayDirection * rayDistance, Color.red);
-			_raycastHit = Physics2D.Raycast(ray, rayDirection, rayDistance, mask);
+			_raycastHit = Physics2D.Raycast(ray, rayDirection, rayDistance, obstacleMask);
 			if (_raycastHit) {
 				// set our new deltaMovement and recalculate the rayDistance taking it into account
 				deltaMovement.y = _raycastHit.point.y - ray.y;
@@ -313,6 +309,70 @@ public class CharacterController2D : MonoBehaviour {
 					break;
 			}
 		}
+	}
+
+	/// <summary>
+	/// Probe ahead along a vector using the raycast anchors established for moving
+	/// </summary>
+	public bool Probe (Vector2 probeDistance) {
+		return (_Probe(probeDistance).collider != null) ? true : false;
+	}
+
+	public bool Probe (Vector2 probeDistance, out RaycastHit2D hit) {
+		hit = _Probe(probeDistance);
+		return (hit.collider != null) ? true : false;
+	}
+
+	private RaycastHit2D _Probe (Vector2 probeDistance) {
+		//FIXME don't do this... or maybe do who cares in this project for right now
+		LayerMask collisionMask = obstacleMask;
+
+		RaycastHit2D hit = new RaycastHit2D();
+		Vector2 raycastAnchor;
+		Vector2 anchor;
+		Vector2 raycastDirection;
+		PrimeRaycastOrigins();
+
+		//Horizontal motion
+		if (probeDistance.x != 0f) {
+			if (probeDistance.x > 0f) {
+				raycastAnchor = _raycastOrigins.bottomRight;
+				raycastDirection = Vector2.right;
+			} else {
+				raycastAnchor = _raycastOrigins.bottomLeft;
+				raycastDirection = Vector2.left;
+			}
+			for (var i = 0; i < totalHorizontalRays; i++) { 
+				anchor = new Vector2 (raycastAnchor.x, raycastAnchor.y + i * _horizontalDistanceBetweenRays);
+				DrawRay(anchor, raycastDirection, Color.blue);
+				_raycastProbeHit = Physics2D.Raycast(anchor, raycastDirection, Mathf.Abs(probeDistance.x) + _skinWidth, collisionMask);
+				if (_raycastProbeHit) {
+					hit = _raycastProbeHit;
+					//					return true;
+				}
+			}
+		}
+
+		//Vertical motion
+		if (probeDistance.y != 0f) {
+			if (probeDistance.y > 0f) {
+				raycastAnchor = _raycastOrigins.topLeft;
+				raycastDirection = Vector2.up;
+			} else {
+				raycastAnchor = _raycastOrigins.bottomLeft;
+				raycastDirection = Vector2.down;
+			}
+			for (var i = 0; i < totalVerticalRays; i++) {
+				anchor = new Vector2 (raycastAnchor.x + i * _horizontalDistanceBetweenRays, raycastAnchor.y);
+				DrawRay(anchor, raycastDirection, Color.blue);
+				_raycastProbeHit = Physics2D.Raycast(anchor, raycastDirection, Mathf.Abs(probeDistance.y) + _skinWidth, collisionMask);
+				if (_raycastProbeHit) {
+					hit = _raycastProbeHit;
+				}
+			}
+		}
+
+		return hit;
 	}
 	#endregion
 

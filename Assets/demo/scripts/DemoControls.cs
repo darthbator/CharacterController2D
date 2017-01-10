@@ -30,7 +30,7 @@ public class DemoControls : MonoBehaviour {
 			moveAmount.x += 1f * moveSpeed * Time.deltaTime;
 
 		if (moveAmount != Vector2.zero) {
-			characterController.move(moveAmount);
+			characterController.Move(moveAmount);
 			spriteGraphics.flipX = (moveAmount.x > 0f) ? false : true;
 			animator.Play("Run");
 		} else
